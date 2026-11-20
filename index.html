@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Quét reel RTS</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; color: #fff; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  #cam { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #top { position: fixed; top: 0; left: 0; right: 0; padding: 10px 12px; background: rgba(0,0,0,.6); display: flex; justify-content: space-between; align-items: center; z-index: 3; font-size: 15px; }
+  #top b { font-size: 20px; }
+  #top button { font-size: 14px; padding: 8px 10px; border: 0; border-radius: 8px; background: #333; color: #fff; margin-left: 6px; }
+  #khungNgam { position: fixed; left: 8%; right: 8%; top: 28%; height: 38%; border: 3px solid rgba(255,255,255,.7); border-radius: 14px; z-index: 2; pointer-events: none; transition: border-color .15s, background .15s; }
+  #khungNgam.co { border-color: #00e676; background: rgba(0,230,118,.35); border-width: 8px; }
+  #khungNgam.khong { border-color: #ff5252; }
+  #bang { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px; background: rgba(0,0,0,.75); z-index: 3; min-height: 120px; }
+  #ket { font-size: 26px; font-weight: 800; text-align: center; min-height: 34px; }
+  #ket.co { color: #00e676; font-size: 34px; }
+  #ket.khong { color: #ff8a80; font-size: 18px; }
+  #chiTiet { text-align: center; font-size: 15px; color: #ddd; min-height: 20px; margin-top: 4px; }
+  #batDau { position: fixed; inset: 0; z-index: 10; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+  #batDau button { font-size: 22px; padding: 18px 30px; border: 0; border-radius: 14px; background: #1a73e8; color: #fff; font-weight: 700; margin-top: 16px; }
+  #batDau p { color: #bbb; font-size: 14px; max-width: 420px; }
+  #ds { position: fixed; inset: 0; z-index: 8; background: #fff; color: #111; overflow: auto; padding: 12px 14px 30px; display: none; }
+  #ds h2 { margin: 4px 0 10px; font-size: 18px; display: flex; justify-content: space-between; }
+  #ds button { font-size: 14px; padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; background: #f5f5f5; }
+  .dong { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #eee; font-size: 15px; }
+  .dong.xong { opacity: .35; text-decoration: line-through; }
+  .so4 { font-weight: 800; font-family: ui-monospace, monospace; font-size: 18px; }
+  textarea { width: 100%; height: 160px; font-family: ui-monospace, monospace; font-size: 13px; }
+  .loi { color: #ff8a80; }
+</style>
+</head>
+<body>
+<video id="cam" playsinline muted autoplay></video>
+<div id="khungNgam"></div>
+<div id="top">
+  <div>Còn <b id="con">0</b>/<span id="tong">0</span></div>
+  <div><button id="nutDen" hidden>🔦 Đèn</button><button id="nutDs">📋 List</button></div>
+</div>
+<div id="bang"><div id="ket">Lật tem vào khung</div><div id="chiTiet"></div></div>
+
+<div id="batDau">
+  <h1 style="margin:0">Quét reel RTS</h1>
+  <p>Bấm để mở camera. Lật cuộn, đưa tem vào khung trắng. Trúng reel cần nhặt → <b style="color:#00e676">khung XANH + bíp</b>.</p>
+  <button id="nutBatDau">▶ BẮT ĐẦU QUÉT</button>
+  <p id="loiCam" class="loi"></p>
+</div>
+
+<div id="ds">
+  <h2><span>List cần nhặt</span><button id="dongDs">✕ Đóng</button></h2>
+  <div id="dsDong"></div>
+  <h2 style="margin-top:20px"><span>Dán list mới</span></h2>
+  <p style="font-size:13px;color:#555;margin:0 0 6px">Mỗi dòng: Reel ID và Part No (copy từ Excel 2 cột là được). Ví dụ: <code>RL261115002069 EBC64038602</code></p>
+  <textarea id="nhapList"></textarea>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button id="luuList">Lưu list mới</button>
+    <button id="boDanhDau">Bỏ đánh dấu đã nhặt</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/zxing-wasm@2.2.4/dist/iife/reader/index.js"></script>
+<script>
+// ===== List mặc định: RTS ca ngày 20/11 (23 reel chưa gạch) =====
+const MAC_DINH = `RL261115002069 EBC64038602
+RL261008001212 EBC64038549
+RL261031000903 EAE63263701
+RL261028003450 EAG66846201
+RL261112000692 EBC64038601
+RL261023001263 EAE65196204
+RL261106003546 EBC64038609
+RL261111003216 EAE63801601
+RL261111003217 EAE63801601
+RL261003003699 EAE65196204
+RL261106001573 EAM64250601
+RL261112001098 EAN00956101
+RL261104000996 EAG61451602
+RL261107000971 EAE66315301
+RL261117001875 EAM35298004
+RL261014002811 EAP65046701
+RL261112001379 EAG66270901
+RL261113003187 EAG65871201
+RL261107001274 EAG65871601
+RL261025001067 EAE64782901
+RL261104001627 EBC64038609
+RL261031000486 EBC63977419
+RL261103002476 EAE64343901`;
+
+const K_LIST = "quetreel_list", K_XONG = "quetreel_xong";
+function doc(k, md) { try { return localStorage.getItem(k) ?? md; } catch(e) { return md; } }
+function ghi(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+let REELS = [], xong = new Set();
+function napList(text) {
+  REELS = [];
+  text.split(/\r?\n/).forEach(d => {
+    const id = (d.toUpperCase().match(/RL\d{12}/) || [])[0];
+    if (!id || REELS.some(r => r.id === id)) return;
+    const pn = (d.toUpperCase().replace(id, "").match(/[A-Z0-9]{8,}/) || [""])[0];
+    REELS.push({ id, pn });
+  });
+}
+napList(doc(K_LIST, MAC_DINH));
+try { xong = new Set(JSON.parse(doc(K_XONG, "[]"))); } catch(e) {}
+const luuXong = () => ghi(K_XONG, JSON.stringify([...xong]));
+
+const $ = id => document.getElementById(id);
+function capNhat() {
+  $("tong").textContent = REELS.length;
+  $("con").textContent = REELS.filter(r => !xong.has(r.id)).length;
+  const sx = [...REELS].sort((a, b) => a.pn.localeCompare(b.pn));
+  $("dsDong").innerHTML = sx.map(r => `<div class="dong ${xong.has(r.id) ? "xong" : ""}"><span><span class="so4">${r.id.slice(-4)}</span> <small>${r.id}</small></span><span>${r.pn}</span></div>`).join("");
+}
+capNhat();
+
+// ===== Âm thanh =====
+let ac = null;
+function bip(f, t) {
+  try {
+    if (!ac) return;
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.value = f; g.gain.value = .4; o.connect(g); g.connect(ac.destination);
+    o.start(); o.stop(ac.currentTime + t);
+  } catch(e) {}
+}
+function rung(p) { try { navigator.vibrate && navigator.vibrate(p); } catch(e) {} }
+
+// ===== Camera + quét =====
+const video = $("cam"), khung = $("khungNgam");
+let track = null, detector = null, dangQuet = false;
+const canvas = document.createElement("canvas"), ctx = canvas.getContext("2d", { willReadFrequently: true });
+const daThay = new Map(); // mã -> thời điểm, chống báo lặp
+
+async function batDau() {
+  try { ac = new (window.AudioContext || window.webkitAudioContext)(); await ac.resume(); } catch(e) {}
+  try {
+    const st = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+    });
+    video.srcObject = st; await video.play();
+    track = st.getVideoTracks()[0];
+    try {
+      const cap = track.getCapabilities ? track.getCapabilities() : {};
+      const adv = [];
+      if (cap.focusMode && cap.focusMode.includes("continuous")) adv.push({ focusMode: "continuous" });
+      if (adv.length) await track.applyConstraints({ advanced: adv });
+      if (cap.torch) $("nutDen").hidden = false;
+    } catch(e) {}
+  } catch(e) {
+    $("loiCam").textContent = "Không mở được camera: " + e.message + ". Cho phép quyền Camera cho trang này rồi thử lại.";
+    return;
+  }
+  // Ưu tiên bộ quét có sẵn của máy (Android Chrome rất nhanh), không có thì dùng ZXing
+  try {
+    if ("BarcodeDetector" in window) {
+      const f = await BarcodeDetector.getSupportedFormats();
+      if (f.length) detector = new BarcodeDetector({ formats: f });
+    }
+  } catch(e) { detector = null; }
+  if (!detector) {
+    try { ZXingWASM.prepareZXingModule({ fireImmediately: true }); } catch(e) {}
+  }
+  $("batDau").style.display = "none";
+  dangQuet = true; vongQuet();
+}
+
+let denBat = false;
+$("nutDen").onclick = async () => {
+  denBat = !denBat;
+  try { await track.applyConstraints({ advanced: [{ torch: denBat }] }); } catch(e) {}
+};
+
+async function docKhung() {
+  // Chỉ đọc vùng giữa (khung ngắm) cho nhanh và đỡ nhầm tem bên cạnh
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw) return [];
+  const sx = Math.round(vw * 0.05), sy = Math.round(vh * 0.2), sw = vw - 2 * sx, sh = Math.round(vh * 0.6);
+  canvas.width = sw; canvas.height = sh;
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
+  if (detector) {
+    const r = await detector.detect(canvas);
+    return r.map(b => b.rawValue);
+  }
+  const img = ctx.getImageData(0, 0, sw, sh);
+  const r = await ZXingWASM.readBarcodes(img, { tryHarder: true, maxNumberOfSymbols: 8, formats: [] });
+  return r.filter(b => b.isValid).map(b => b.text);
+}
+
+let tatBao = null;
+function bao(loai, chinh, phu) {
+  $("ket").className = loai; $("ket").textContent = chinh; $("chiTiet").textContent = phu || "";
+  khung.className = loai;
+  clearTimeout(tatBao);
+  tatBao = setTimeout(() => { khung.className = ""; if (loai !== "co") { $("ket").className = ""; $("ket").textContent = "Lật tem vào khung"; $("chiTiet").textContent = ""; } }, loai === "co" ? 2500 : 900);
+}
+
+function xuLy(ma) {
+  const t = String(ma).toUpperCase(), now = Date.now();
+  const id = (t.match(/RL\d{12}/) || [])[0];
+  const khoa = id || t;
+  if (daThay.has(khoa) && now - daThay.get(khoa) < 2500) return;
+  daThay.set(khoa, now);
+  if (!id) return; // mã khác (PN, lot…) bỏ qua
+  const r = REELS.find(x => x.id === id);
+  if (r) {
+    const truoc = xong.has(id);
+    xong.add(id); luuXong(); capNhat();
+    bao("co", "✅ NHẶT! " + id.slice(-4), r.pn + (truoc ? " · (đã quét rồi)" : ""));
+    bip(1300, .18); setTimeout(() => bip(1700, .18), 200); rung([120, 60, 120]);
+  } else {
+    bao("khong", "✗ Không cần · " + id.slice(-4), "");
+    bip(350, .06);
+  }
+}
+
+async function vongQuet() {
+  if (!dangQuet) return;
+  try {
+    if (!document.hidden) {
+      const ds = await docKhung();
+      ds.forEach(xuLy);
+    }
+  } catch(e) {}
+  setTimeout(vongQuet, detector ? 60 : 120);
+}
+
+$("nutBatDau").onclick = batDau;
+$("nutDs").onclick = () => { $("ds").style.display = "block"; $("nhapList").value = doc(K_LIST, MAC_DINH); };
+$("dongDs").onclick = () => { $("ds").style.display = "none"; };
+$("luuList").onclick = () => {
+  const v = $("nhapList").value; napList(v);
+  if (!REELS.length) { alert("Không thấy Reel ID nào (dạng RL + 12 số)"); napList(doc(K_LIST, MAC_DINH)); return; }
+  ghi(K_LIST, v); xong = new Set(); luuXong(); capNhat(); $("ds").style.display = "none";
+};
+$("boDanhDau").onclick = () => { xong = new Set(); luuXong(); capNhat(); };
+</script>
+</body>
+</html>
