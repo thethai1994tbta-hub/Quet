@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>Quét tìm liệu theo PN</title>
+<title>Quét tìm liệu theo PN / Reel</title>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: #000; color: #fff; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
   #cam { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  #top { position: fixed; top: 0; left: 0; right: 0; padding: 10px 12px; background: rgba(0,0,0,.65); display: flex; justify-content: space-between; align-items: center; z-index: 3; font-size: 15px; }
+  #top { position: fixed; top: 0; left: 0; right: 0; padding: 10px 12px; background: rgba(0,0,0,.65); display: flex; justify-content: space-between; align-items: center; z-index: 3; font-size: 15px; gap: 6px; }
   #top b { font-size: 20px; }
   #top button { font-size: 15px; padding: 9px 12px; border: 0; border-radius: 8px; background: #333; color: #fff; margin-left: 6px; }
+  #nutCheDo { background: #1a73e8 !important; font-weight: 700; }
   #khungNgam { position: fixed; left: 8%; right: 8%; top: 28%; height: 38%; border: 3px solid rgba(255,255,255,.7); border-radius: 14px; z-index: 2; pointer-events: none; transition: border-color .15s, background .15s; }
   #khungNgam.co { border-color: #00e676; background: rgba(0,230,118,.35); border-width: 8px; }
   #khungNgam.khong { border-color: #ff5252; }
@@ -19,27 +20,29 @@
   #ket.co { color: #00e676; font-size: 32px; }
   #ket.khong { color: #ff8a80; font-size: 17px; }
   #chiTiet { text-align: center; font-size: 15px; color: #ddd; min-height: 20px; margin-top: 4px; }
-  #batDau { position: fixed; inset: 0; z-index: 10; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-  #batDau .nut { font-size: 21px; padding: 16px 26px; border: 0; border-radius: 14px; background: #1a73e8; color: #fff; font-weight: 700; margin-top: 14px; width: 100%; max-width: 360px; }
-  #batDau .nut.phu { background: #333; font-size: 17px; }
+  #batDau { position: fixed; inset: 0; z-index: 10; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; overflow: auto; }
+  #batDau .nut { font-size: 20px; padding: 16px 26px; border: 0; border-radius: 14px; background: #1a73e8; color: #fff; font-weight: 700; margin-top: 12px; width: 100%; max-width: 360px; }
+  #batDau .nut.reel { background: #8e24aa; }
+  #batDau .nut.phu { background: #333; font-size: 16px; padding: 13px 20px; }
   #batDau p { color: #bbb; font-size: 14px; max-width: 420px; }
   .loi { color: #ff8a80; }
 
-  /* Màn danh sách PN */
-  #ds { position: fixed; inset: 0; z-index: 12; background: #f4f5f7; color: #111; overflow: auto; padding: 12px 14px 40px; display: none; }
-  #ds h2 { margin: 6px 0 10px; font-size: 19px; display: flex; justify-content: space-between; align-items: center; }
-  #ds button { font-size: 15px; padding: 10px 14px; border-radius: 8px; border: 1px solid #ccc; background: #fff; }
-  #ds button.chinh { background: #1a73e8; color: #fff; border-color: #1a73e8; font-weight: 700; }
-  #ds button.do { color: #c5221f; }
+  /* Màn danh sách */
+  .man { position: fixed; inset: 0; z-index: 12; background: #f4f5f7; color: #111; overflow: auto; padding: 12px 14px 40px; display: none; }
+  .man h2 { margin: 6px 0 10px; font-size: 19px; display: flex; justify-content: space-between; align-items: center; }
+  .man button { font-size: 15px; padding: 10px 14px; border-radius: 8px; border: 1px solid #ccc; background: #fff; }
+  .man button.chinh { background: #1a73e8; color: #fff; border-color: #1a73e8; font-weight: 700; }
+  #mReel button.chinh { background: #8e24aa; border-color: #8e24aa; }
+  .man button.do { color: #c5221f; }
   .the { background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
   .hang { display: flex; gap: 8px; }
   .hang input { flex: 1; font-size: 18px; padding: 10px; border: 1px solid #bbb; border-radius: 8px; text-transform: uppercase; font-family: ui-monospace, monospace; min-width: 0; }
-  #oGhiChu { text-transform: none; font-family: inherit; font-size: 15px; margin-top: 8px; width: 100%; }
+  .oGC { text-transform: none; font-family: inherit; font-size: 15px; margin-top: 8px; width: 100%; padding: 10px; border: 1px solid #bbb; border-radius: 8px; }
   textarea { width: 100%; height: 170px; font-family: ui-monospace, monospace; font-size: 14px; padding: 8px; border: 1px solid #bbb; border-radius: 8px; }
   .meo { font-size: 13px; color: #666; margin: 6px 0; }
   .dong { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #eee; gap: 8px; }
   .dong:last-child { border-bottom: 0; }
-  .pn { font-weight: 800; font-family: ui-monospace, monospace; font-size: 17px; }
+  .pn { font-weight: 800; font-family: ui-monospace, monospace; font-size: 17px; word-break: break-all; }
   .gc { font-size: 13px; color: #666; }
   .dem { font-size: 13px; background: #e6f4ea; color: #137333; padding: 3px 8px; border-radius: 10px; white-space: nowrap; }
   .dem.chua { background: #eee; color: #777; }
@@ -50,53 +53,88 @@
 <video id="cam" playsinline muted autoplay></video>
 <div id="khungNgam"></div>
 <div id="top">
-  <div>PN cần tìm: <b id="tong">0</b> · Đã gặp: <b id="daGap">0</b> cuộn</div>
-  <div><button id="nutDen" hidden>🔦</button><button id="nutDs">📋 PN</button></div>
+  <div id="thongKe"></div>
+  <div style="white-space:nowrap"><button id="nutDen" hidden>🔦</button><button id="nutCheDo">PN</button><button id="nutDs">📋</button></div>
 </div>
 <div id="bang"><div id="ket">Lật tem vào khung</div><div id="chiTiet"></div></div>
 
 <div id="batDau">
-  <h1 style="margin:0">Quét tìm liệu theo PN</h1>
-  <p>Nhập danh sách PN cần tìm, rồi bấm Bắt đầu. Lật cuộn đưa tem vào khung — tem có PN trong danh sách → <b style="color:#00e676">khung XANH + bíp</b>.</p>
-  <button class="nut" id="nutBatDau">▶ BẮT ĐẦU QUÉT</button>
-  <button class="nut phu" id="nutDs2">📋 Nhập / sửa danh sách PN</button>
-  <p id="tomTat"></p>
+  <h1 style="margin:0">Quét tìm liệu</h1>
+  <p>Chọn cách tìm. Lật cuộn đưa tem vào khung — tem khớp danh sách → <b style="color:#00e676">khung XANH + bíp</b>.</p>
+  <button class="nut" id="nutQuetPN">▶ TÌM THEO PN</button>
+  <p id="tomTatPN" style="margin:4px 0"></p>
+  <button class="nut reel" id="nutQuetReel">▶ TÌM THEO REEL</button>
+  <p id="tomTatReel" style="margin:4px 0"></p>
+  <button class="nut phu" id="nutMoPN">📋 Danh sách PN</button>
+  <button class="nut phu" id="nutMoReel">📋 Danh sách Reel</button>
   <p id="loiCam" class="loi"></p>
 </div>
 
-<div id="ds">
-  <h2><span>Danh sách PN cần tìm</span><button id="dongDs" class="chinh">✓ Xong</button></h2>
-
+<!-- ===== Màn danh sách PN ===== -->
+<div id="mPN" class="man">
+  <h2><span>Danh sách PN cần tìm</span><button class="chinh dongMan">✓ Xong</button></h2>
   <div class="the">
     <b>Thêm nhanh 1 PN</b>
     <div class="hang" style="margin-top:8px">
       <input id="oPN" placeholder="VD: EAE63801601" autocomplete="off" autocapitalize="characters">
-      <button id="nutThem" class="chinh">+ Thêm</button>
+      <button id="nutThemPN" class="chinh">+ Thêm</button>
     </div>
-    <input id="oGhiChu" placeholder="Ghi chú (không bắt buộc) — VD: L2 MT-2-2-C-F, cần 2 cuộn">
+    <input id="oGhiChuPN" class="oGC" placeholder="Ghi chú (không bắt buộc) — VD: L2 MT-2-2-C-F, cần 2 cuộn">
   </div>
-
   <div class="the">
     <b>Danh sách hiện tại</b> <span class="gc" id="soPN"></span>
-    <div id="dsDong"></div>
+    <div id="dsPN"></div>
   </div>
-
   <div class="the">
     <b>Dán nhiều PN 1 lúc</b>
-    <p class="meo">Mỗi dòng 1 PN, sau PN có thể ghi chú. Copy cột PN từ Excel/Zalo dán vào là được. Dòng có Reel ID (RL…) cũng nhận, trang lấy PN trong dòng đó.</p>
-    <textarea id="nhapList" placeholder="EAE63801601 L2 slot 2010
+    <p class="meo">Mỗi dòng 1 PN, sau PN có thể ghi chú. Dòng có Reel ID (RL…) cũng nhận, trang lấy PN trong dòng đó.</p>
+    <textarea id="nhapPN" placeholder="EAE63801601 L2 slot 2010
 EAG66744501
 EBC64038609 cần 2 cuộn"></textarea>
     <div class="hang" style="margin-top:8px">
-      <button id="nutThemNhieu" class="chinh">Thêm vào danh sách</button>
-      <button id="nutThayThe">Thay cả danh sách</button>
+      <button id="nutThemNhieuPN" class="chinh">Thêm vào danh sách</button>
+      <button id="nutThayPN">Thay cả danh sách</button>
     </div>
   </div>
-
   <div class="the">
     <div class="hang">
-      <button id="boDem">Đặt lại số đã gặp</button>
-      <button id="xoaHet" class="do">Xóa hết PN</button>
+      <button id="boDemPN">Đặt lại số đã gặp</button>
+      <button id="xoaHetPN" class="do">Xóa hết PN</button>
+    </div>
+    <p class="meo">Danh sách được lưu trên điện thoại này, lần sau mở trang vẫn còn.</p>
+  </div>
+</div>
+
+<!-- ===== Màn danh sách Reel ===== -->
+<div id="mReel" class="man">
+  <h2><span>Danh sách Reel cần tìm</span><button class="chinh dongMan">✓ Xong</button></h2>
+  <div class="the">
+    <b>Thêm nhanh 1 Reel</b>
+    <div class="hang" style="margin-top:8px">
+      <input id="oReel" placeholder="VD: RL250912345678" autocomplete="off" autocapitalize="characters">
+      <button id="nutThemReel" class="chinh">+ Thêm</button>
+    </div>
+    <input id="oGhiChuReel" class="oGC" placeholder="Ghi chú (không bắt buộc) — VD: PN, vị trí xe">
+  </div>
+  <div class="the">
+    <b>Danh sách hiện tại</b> <span class="gc" id="soReel"></span>
+    <div id="dsReel"></div>
+  </div>
+  <div class="the">
+    <b>Dán nhiều Reel 1 lúc</b>
+    <p class="meo">Mỗi dòng 1 Reel ID (RL + 12 số). Phần còn lại của dòng (PN, SL…) thành ghi chú. Copy cột Reel từ LMS/Excel/Zalo dán vào là được.</p>
+    <textarea id="nhapReel" placeholder="RL250912345678 EAE63801601
+RL250912345679
+RL250912345680 xe 3"></textarea>
+    <div class="hang" style="margin-top:8px">
+      <button id="nutThemNhieuReel" class="chinh">Thêm vào danh sách</button>
+      <button id="nutThayReel">Thay cả danh sách</button>
+    </div>
+  </div>
+  <div class="the">
+    <div class="hang">
+      <button id="boDemReel">Đặt lại đã thấy</button>
+      <button id="xoaHetReel" class="do">Xóa hết Reel</button>
     </div>
     <p class="meo">Danh sách được lưu trên điện thoại này, lần sau mở trang vẫn còn.</p>
   </div>
@@ -105,24 +143,29 @@ EBC64038609 cần 2 cuộn"></textarea>
 <script src="https://cdn.jsdelivr.net/npm/zxing-wasm@2.2.4/dist/iife/reader/index.js"></script>
 <script>
 // ===== Lưu trữ =====
-const K_DS = "timlieu_pn_ds", K_GAP = "timlieu_pn_gap";
+const K_DS = "timlieu_pn_ds", K_GAP = "timlieu_pn_gap", K_REEL = "timlieu_reel_ds", K_CHEDO = "timlieu_chedo";
 function docKho(k, md) { try { const v = localStorage.getItem(k); return v === null ? md : JSON.parse(v); } catch(e) { return md; } }
 function ghiKho(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
 
-// danhSach: [{pn, ghiChu}] ; daGap: { pn: [mã cuộn/nội dung tem đã gặp] }
+// danhSach: [{pn, ghiChu}] ; daGap: { pn: [mã cuộn đã gặp] }
 let danhSach = docKho(K_DS, []);
 let daGap = docKho(K_GAP, {});
-const luu = () => { ghiKho(K_DS, danhSach); ghiKho(K_GAP, daGap); };
+// dsReel: [{reel, ghiChu, thay}] — thay = thời điểm thấy lần đầu (ms), 0 = chưa thấy
+let dsReel = docKho(K_REEL, []);
+let cheDo = docKho(K_CHEDO, "pn"); // "pn" | "reel"
+const luu = () => { ghiKho(K_DS, danhSach); ghiKho(K_GAP, daGap); ghiKho(K_REEL, dsReel); ghiKho(K_CHEDO, cheDo); };
 
 const $ = id => document.getElementById(id);
 const chuan = s => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+const thoat = s => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const MAU_REEL = /RL\d{12}/g;
+const gioPhut = ms => { const d = new Date(ms); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
 
-// Tách 1 dòng → {pn, ghiChu}
-function tachDong(d) {
+// ----- PN -----
+function tachDongPN(d) {
   let t = String(d || "").trim();
   if (!t) return null;
-  const reel = t.toUpperCase().match(/RL\d{12}/);
-  if (reel) t = t.replace(new RegExp(reel[0], "i"), " ").trim();
+  t = t.replace(/RL\d{12}/gi, " ").trim();
   const m = t.match(/[A-Za-z0-9][A-Za-z0-9\-]{5,}/);
   if (!m) return null;
   const pn = chuan(m[0]);
@@ -138,49 +181,118 @@ function themPN(pn, ghiChu) {
   return true;
 }
 
-function veDs() {
+// ----- Reel -----
+function tachDongReel(d) {
+  const t = String(d || "").trim();
+  if (!t) return null;
+  const m = t.toUpperCase().match(/RL\d{12}/);
+  if (!m) return null;
+  const ghiChu = t.replace(new RegExp(m[0], "i"), " ").replace(/\s+/g, " ").replace(/^[\s,;:\-\t|]+/, "").trim();
+  return { reel: m[0], ghiChu };
+}
+function themReel(reel, ghiChu) {
+  reel = chuan(reel); if (!/^RL\d{12}$/.test(reel)) return false;
+  const co = dsReel.find(x => x.reel === reel);
+  if (co) { if (ghiChu) co.ghiChu = ghiChu; return true; }
+  dsReel.push({ reel, ghiChu: ghiChu || "", thay: 0 });
+  return true;
+}
+
+// ===== Vẽ =====
+function veThongKe() {
   const tongGap = Object.values(daGap).reduce((a, b) => a + b.length, 0);
-  $("tong").textContent = danhSach.length;
-  $("daGap").textContent = tongGap;
+  const reelThay = dsReel.filter(x => x.thay).length;
+  $("thongKe").innerHTML = cheDo === "pn"
+    ? `PN cần tìm: <b>${danhSach.length}</b> · Đã gặp: <b>${tongGap}</b> cuộn`
+    : `Reel đã thấy: <b>${reelThay}</b> / <b>${dsReel.length}</b>`;
+  $("nutCheDo").textContent = cheDo === "pn" ? "PN ⇄" : "Reel ⇄";
+  $("nutCheDo").style.background = cheDo === "pn" ? "#1a73e8" : "#8e24aa";
+  $("tomTatPN").textContent = danhSach.length ? `Đang có ${danhSach.length} PN.` : "Chưa có PN nào.";
+  $("tomTatReel").textContent = dsReel.length ? `Đang có ${dsReel.length} reel, đã thấy ${reelThay}.` : "Chưa có reel nào.";
+}
+function veDsPN() {
   $("soPN").textContent = `(${danhSach.length} PN)`;
-  $("tomTat").textContent = danhSach.length ? `Đang có ${danhSach.length} PN trong danh sách.` : "Chưa có PN nào — bấm nút nhập danh sách trước.";
   const sx = [...danhSach].sort((a, b) => a.pn.localeCompare(b.pn));
-  $("dsDong").innerHTML = sx.length ? sx.map(x => {
+  $("dsPN").innerHTML = sx.length ? sx.map(x => {
     const n = (daGap[x.pn] || []).length;
-    return `<div class="dong"><div><div class="pn">${x.pn}</div>${x.ghiChu ? `<div class="gc">${x.ghiChu.replace(/</g, "&lt;")}</div>` : ""}</div>
+    return `<div class="dong"><div><div class="pn">${x.pn}</div>${x.ghiChu ? `<div class="gc">${thoat(x.ghiChu)}</div>` : ""}</div>
       <div style="display:flex;align-items:center;gap:4px"><span class="dem ${n ? "" : "chua"}">${n ? "Đã gặp " + n : "Chưa gặp"}</span><button class="xoa" data-pn="${x.pn}">✕</button></div></div>`;
   }).join("") : `<p class="meo">Chưa có PN nào.</p>`;
 }
-veDs();
+function veDsReel() {
+  const thay = dsReel.filter(x => x.thay).length;
+  $("soReel").textContent = `(${dsReel.length} reel · đã thấy ${thay})`;
+  // Chưa thấy lên trước, rồi theo mã
+  const sx = [...dsReel].sort((a, b) => (!!a.thay - !!b.thay) || a.reel.localeCompare(b.reel));
+  $("dsReel").innerHTML = sx.length ? sx.map(x => `<div class="dong"><div><div class="pn">${x.reel}</div>${x.ghiChu ? `<div class="gc">${thoat(x.ghiChu)}</div>` : ""}</div>
+      <div style="display:flex;align-items:center;gap:4px"><span class="dem ${x.thay ? "" : "chua"}">${x.thay ? "Đã thấy " + gioPhut(x.thay) : "Chưa thấy"}</span><button class="xoa" data-reel="${x.reel}">✕</button></div></div>`
+  ).join("") : `<p class="meo">Chưa có reel nào.</p>`;
+}
+const veHet = () => { veThongKe(); veDsPN(); veDsReel(); };
+veHet();
 
-// ===== Màn danh sách =====
-const moDs = () => { $("ds").style.display = "block"; veDs(); };
-$("nutDs").onclick = moDs; $("nutDs2").onclick = moDs;
-$("dongDs").onclick = () => { $("ds").style.display = "none"; veDs(); };
-$("nutThem").onclick = () => {
-  if (themPN($("oPN").value, $("oGhiChu").value.trim())) { luu(); $("oPN").value = ""; $("oGhiChu").value = ""; veDs(); $("oPN").focus(); }
-  else { $("oPN").style.borderColor = "#d93025"; setTimeout(() => $("oPN").style.borderColor = "", 800); }
+// ===== Mở/đóng màn danh sách =====
+const moMan = id => { $(id).style.display = "block"; veHet(); };
+document.querySelectorAll(".dongMan").forEach(b => b.onclick = () => { document.querySelectorAll(".man").forEach(m => m.style.display = "none"); veHet(); });
+$("nutMoPN").onclick = () => moMan("mPN");
+$("nutMoReel").onclick = () => moMan("mReel");
+$("nutDs").onclick = () => moMan(cheDo === "pn" ? "mPN" : "mReel");
+$("nutCheDo").onclick = () => { cheDo = cheDo === "pn" ? "reel" : "pn"; luu(); vuaThay.clear(); veThongKe(); bao("", cheDo === "pn" ? "Đang tìm theo PN" : "Đang tìm theo REEL", ""); };
+
+function nhayDo(el) { el.style.borderColor = "#d93025"; setTimeout(() => el.style.borderColor = "", 800); }
+
+// ----- Nút màn PN -----
+$("nutThemPN").onclick = () => {
+  if (themPN($("oPN").value, $("oGhiChuPN").value.trim())) { luu(); $("oPN").value = ""; $("oGhiChuPN").value = ""; veHet(); $("oPN").focus(); }
+  else nhayDo($("oPN"));
 };
-$("oPN").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("nutThem").click(); } });
-function nhapNhieu(thayThe) {
-  const dong = $("nhapList").value.split(/\r?\n/).map(tachDong).filter(Boolean);
-  if (!dong.length) { $("nhapList").style.borderColor = "#d93025"; return; }
+$("oPN").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("nutThemPN").click(); } });
+function nhapNhieuPN(thayThe) {
+  const dong = $("nhapPN").value.split(/\r?\n/).map(tachDongPN).filter(Boolean);
+  if (!dong.length) { nhayDo($("nhapPN")); return; }
   if (thayThe) { danhSach = []; daGap = {}; }
   dong.forEach(x => themPN(x.pn, x.ghiChu));
-  luu(); $("nhapList").value = ""; $("nhapList").style.borderColor = ""; veDs();
+  luu(); $("nhapPN").value = ""; veHet();
 }
-$("nutThemNhieu").onclick = () => nhapNhieu(false);
-$("nutThayThe").onclick = () => nhapNhieu(true);
-$("dsDong").addEventListener("click", e => {
+$("nutThemNhieuPN").onclick = () => nhapNhieuPN(false);
+$("nutThayPN").onclick = () => nhapNhieuPN(true);
+$("dsPN").addEventListener("click", e => {
   const pn = e.target.dataset && e.target.dataset.pn; if (!pn) return;
-  danhSach = danhSach.filter(x => x.pn !== pn); delete daGap[pn]; luu(); veDs();
+  danhSach = danhSach.filter(x => x.pn !== pn); delete daGap[pn]; luu(); veHet();
 });
-$("boDem").onclick = () => { daGap = {}; luu(); veDs(); };
-let chacXoa = false;
-$("xoaHet").onclick = () => {
-  if (!chacXoa) { chacXoa = true; $("xoaHet").textContent = "Bấm lần nữa để xóa"; setTimeout(() => { chacXoa = false; $("xoaHet").textContent = "Xóa hết PN"; }, 3000); return; }
-  danhSach = []; daGap = {}; luu(); veDs(); chacXoa = false; $("xoaHet").textContent = "Xóa hết PN";
+$("boDemPN").onclick = () => { daGap = {}; luu(); veHet(); };
+
+// ----- Nút màn Reel -----
+$("nutThemReel").onclick = () => {
+  if (themReel($("oReel").value, $("oGhiChuReel").value.trim())) { luu(); $("oReel").value = ""; $("oGhiChuReel").value = ""; veHet(); $("oReel").focus(); }
+  else nhayDo($("oReel"));
 };
+$("oReel").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("nutThemReel").click(); } });
+function nhapNhieuReel(thayThe) {
+  const dong = $("nhapReel").value.split(/\r?\n/).map(tachDongReel).filter(Boolean);
+  if (!dong.length) { nhayDo($("nhapReel")); return; }
+  if (thayThe) dsReel = [];
+  dong.forEach(x => themReel(x.reel, x.ghiChu));
+  luu(); $("nhapReel").value = ""; veHet();
+}
+$("nutThemNhieuReel").onclick = () => nhapNhieuReel(false);
+$("nutThayReel").onclick = () => nhapNhieuReel(true);
+$("dsReel").addEventListener("click", e => {
+  const r = e.target.dataset && e.target.dataset.reel; if (!r) return;
+  dsReel = dsReel.filter(x => x.reel !== r); luu(); veHet();
+});
+$("boDemReel").onclick = () => { dsReel.forEach(x => x.thay = 0); luu(); veHet(); };
+
+// Nút xóa hết: bấm 2 lần mới xóa
+function nutXoa2Lan(id, nhan, lam) {
+  let chac = false;
+  $(id).onclick = () => {
+    if (!chac) { chac = true; $(id).textContent = "Bấm lần nữa để xóa"; setTimeout(() => { chac = false; $(id).textContent = nhan; }, 3000); return; }
+    lam(); luu(); veHet(); chac = false; $(id).textContent = nhan;
+  };
+}
+nutXoa2Lan("xoaHetPN", "Xóa hết PN", () => { danhSach = []; daGap = {}; });
+nutXoa2Lan("xoaHetReel", "Xóa hết Reel", () => { dsReel = []; });
 
 // ===== Âm thanh =====
 let ac = null;
@@ -199,8 +311,11 @@ let track = null, detector = null, dangQuet = false;
 const canvas = document.createElement("canvas"), ctx = canvas.getContext("2d", { willReadFrequently: true });
 const vuaThay = new Map(); // nội dung tem -> thời điểm, chống báo lặp
 
-async function batDau() {
-  if (!danhSach.length) { moDs(); return; }
+async function batDau(cd) {
+  cheDo = cd; luu(); veThongKe();
+  if (cd === "pn" && !danhSach.length) { moMan("mPN"); return; }
+  if (cd === "reel" && !dsReel.length) { moMan("mReel"); return; }
+  if (dangQuet) { $("batDau").style.display = "none"; return; }
   try { ac = new (window.AudioContext || window.webkitAudioContext)(); await ac.resume(); } catch(e) {}
   try {
     const st = await navigator.mediaDevices.getUserMedia({
@@ -228,6 +343,8 @@ async function batDau() {
   $("batDau").style.display = "none";
   dangQuet = true; vongQuet();
 }
+$("nutQuetPN").onclick = () => batDau("pn");
+$("nutQuetReel").onclick = () => batDau("reel");
 
 let denBat = false;
 $("nutDen").onclick = async () => { denBat = !denBat; try { await track.applyConstraints({ advanced: [{ torch: denBat }] }); } catch(e) {} };
@@ -251,31 +368,54 @@ function bao(loai, chinh, phu) {
   clearTimeout(tatBao);
   tatBao = setTimeout(() => { khung.className = ""; if (loai !== "co") { $("ket").className = ""; $("ket").textContent = "Lật tem vào khung"; $("chiTiet").textContent = ""; } }, loai === "co" ? 2500 : 900);
 }
+function baoTrung() { bip(1300, .18); setTimeout(() => bip(1700, .18), 200); rung([120, 60, 120]); }
 
-// Xử lý 1 lần quét: gom tất cả mã đọc được trong khung (tem có thể có nhiều mã: PN, reel, lot…)
-function xuLy(cacMa) {
-  if (!cacMa.length) return;
-  const gop = cacMa.map(chuan).join("|");
-  const now = Date.now();
-  if (vuaThay.has(gop) && now - vuaThay.get(gop) < 2500) return;
-  vuaThay.set(gop, now);
-
-  const reel = (cacMa.join(" ").toUpperCase().match(/RL\d{12}/) || [])[0] || "";
-  // PN dài khớp trước, tránh PN ngắn khớp nhầm
-  const sx = [...danhSach].sort((a, b) => b.pn.length - a.pn.length);
+// ----- Xử lý theo PN -----
+function xuLyPN(cacMa, gop, reel) {
+  const sx = [...danhSach].sort((a, b) => b.pn.length - a.pn.length); // PN dài khớp trước
   const trung = sx.find(x => gop.includes(x.pn));
   if (trung) {
     const khoaCuon = reel || gop.slice(0, 60);
     const ds = daGap[trung.pn] || (daGap[trung.pn] = []);
     const moi = !ds.includes(khoaCuon);
-    if (moi) { ds.push(khoaCuon); luu(); veDs(); }
+    if (moi) { ds.push(khoaCuon); luu(); veThongKe(); }
     bao("co", "✅ NHẶT! " + trung.pn,
       (trung.ghiChu ? trung.ghiChu + " · " : "") + (reel ? "cuộn " + reel.slice(-4) + " · " : "") + (moi ? `gặp cuộn thứ ${ds.length}` : "cuộn này quét rồi"));
-    bip(1300, .18); setTimeout(() => bip(1700, .18), 200); rung([120, 60, 120]);
+    baoTrung();
   } else {
     bao("khong", "✗ Không cần", reel ? "cuộn " + reel.slice(-4) : cacMa[0].slice(0, 30));
     bip(350, .06);
   }
+}
+
+// ----- Xử lý theo Reel -----
+function xuLyReel(cacMa, gop) {
+  const reels = [...new Set(gop.match(MAU_REEL) || [])];
+  const trung = dsReel.find(x => reels.includes(x.reel));
+  if (trung) {
+    const moi = !trung.thay;
+    if (moi) { trung.thay = Date.now(); luu(); veThongKe(); }
+    const conLai = dsReel.filter(x => !x.thay).length;
+    bao("co", "✅ NHẶT! " + trung.reel.slice(-6),
+      (trung.ghiChu ? trung.ghiChu + " · " : "") + (moi ? `còn ${conLai} reel chưa thấy` : "reel này quét rồi"));
+    baoTrung();
+  } else if (reels.length) {
+    bao("khong", "✗ Không cần", "reel " + reels[0].slice(-6));
+    bip(350, .06);
+  } else {
+    bao("khong", "Chưa đọc được Reel ID", "đưa mã Reel trên tem vào khung");
+  }
+}
+
+function xuLy(cacMa) {
+  if (!cacMa.length) return;
+  const gop = cacMa.map(chuan).join("|");
+  const now = Date.now();
+  const khoa = cheDo + ":" + gop;
+  if (vuaThay.has(khoa) && now - vuaThay.get(khoa) < 2500) return;
+  vuaThay.set(khoa, now);
+  if (cheDo === "reel") xuLyReel(cacMa, gop);
+  else xuLyPN(cacMa, gop, (gop.match(MAU_REEL) || [])[0] || "");
 }
 
 async function vongQuet() {
@@ -283,7 +423,6 @@ async function vongQuet() {
   try { if (!document.hidden) xuLy(await docKhung()); } catch(e) {}
   setTimeout(vongQuet, detector ? 60 : 120);
 }
-$("nutBatDau").onclick = batDau;
 </script>
 </body>
 </html>
