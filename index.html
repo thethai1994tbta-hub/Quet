@@ -2,93 +2,153 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tìm liệu">
+<meta name="theme-color" content="#000000">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAACKElEQVR42u3dXU7CQBSG4eGEPZjALoVlqLvUyC7cQOXH4PSbzvNcekHo+HI6rSnuDqfvBkvKEiAOxIE4EAfiQByIA3EgDsQB4kAciANxIA7EgTgQB+JAHCAOxIE4EAfiQByIA3EgDsQB4kAciANxIA7EgTgQB+JAHIgDxIE4EAf/aR/1bj7fXvxKjudLyDvZJfxLDU1kVrJyHLJITqSUEW7FVVpncshiiBFSyjBCXMoSH4exMdDqlTL00Ya4CRZ1C8gVXL+rlZuHPXkWgWtVBoar1ug4lJG5JmUramuSOzmMjdiVcRMMcSAO2oZvgl3Zdi2egxe3Zsfz5befP7TF6/A6j76+yYHTCuJAHIgDcYA4EAfiQByIA3EgDsSBOBAH4gBxIA7EgTgQB1me8BUMX6cP65jp8P5qcuC0gjgQB+JAHLiUbU//mqL7n1if8Cn7v62byYHTCuJAHIgDcSAOxAHiQByIA3EgDsSBOBAH4kAcIA7EgTgQB82jCXg0AacVxIE4ep1WbTimiMOuc8T1LB8RYyN9z6GPwNXodJ/j/mOe/AQUtUR7HxoiTiu2pWOtYW342JThJhgbisPwGGXdul6t2HuO9XGqCY9ZGQNMDiMk/MMTEYdKMgdqVhz4kz3iQByIA3GAOBAH4kAciANxIA7EgTgQB4gDcSAOxIE4EAfiQByIA3EgDhAH4kAciANxIA7EgTgQB+IAcSAOxIE4EAfiQByIg835Afk2qN0HdhkKAAAAAElFTkSuQmCC">
 <title>Quét tìm liệu theo PN / Reel</title>
 <style>
-  * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: #000; color: #fff; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-  #cam { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  #top { position: fixed; top: 0; left: 0; right: 0; padding: 10px 12px; background: rgba(0,0,0,.65); display: flex; justify-content: space-between; align-items: center; z-index: 3; font-size: 15px; gap: 6px; }
-  #top b { font-size: 20px; }
-  #top button { font-size: 15px; padding: 9px 12px; border: 0; border-radius: 8px; background: #333; color: #fff; margin-left: 6px; }
-  #nutCheDo { background: #1a73e8 !important; font-weight: 700; }
-  #khungNgam { position: fixed; left: 8%; right: 8%; top: 28%; height: 38%; border: 3px solid rgba(255,255,255,.7); border-radius: 14px; z-index: 2; pointer-events: none; transition: border-color .15s, background .15s; }
-  #khungNgam.co { border-color: #00e676; background: rgba(0,230,118,.35); border-width: 8px; }
-  #khungNgam.khong { border-color: #ff5252; }
-  #bang { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px; background: rgba(0,0,0,.8); z-index: 3; min-height: 120px; }
-  #ket { font-size: 24px; font-weight: 800; text-align: center; min-height: 32px; }
-  #ket.co { color: #00e676; font-size: 32px; }
-  #ket.khong { color: #ff8a80; font-size: 17px; }
-  #chiTiet { text-align: center; font-size: 15px; color: #ddd; min-height: 20px; margin-top: 4px; }
-  #batDau { position: fixed; inset: 0; z-index: 10; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; overflow: auto; }
-  #batDau .nut { font-size: 20px; padding: 16px 26px; border: 0; border-radius: 14px; background: #1a73e8; color: #fff; font-weight: 700; margin-top: 12px; width: 100%; max-width: 360px; }
-  #batDau .nut.reel { background: #8e24aa; }
-  #batDau .nut.phu { background: #333; font-size: 16px; padding: 13px 20px; }
-  #batDau p { color: #bbb; font-size: 14px; max-width: 420px; }
-  .loi { color: #ff8a80; }
+  :root {
+    --tren: env(safe-area-inset-top, 0px);
+    --duoi: env(safe-area-inset-bottom, 0px);
+    --trai: env(safe-area-inset-left, 0px);
+    --phai: env(safe-area-inset-right, 0px);
+    --xanh: #0a84ff; --tim: #bf5af2; --luc: #30d158; --do: #ff453a;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #000; color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+  body { position: fixed; inset: 0; overflow: hidden; }
+  button { font-family: inherit; touch-action: manipulation; -webkit-user-select: none; user-select: none; cursor: pointer; }
+  button:active { transform: scale(.96); opacity: .85; }
 
-  /* Màn danh sách */
-  .man { position: fixed; inset: 0; z-index: 12; background: #f4f5f7; color: #111; overflow: auto; padding: 12px 14px 40px; display: none; }
-  .man h2 { margin: 6px 0 10px; font-size: 19px; display: flex; justify-content: space-between; align-items: center; }
-  .man button { font-size: 15px; padding: 10px 14px; border-radius: 8px; border: 1px solid #ccc; background: #fff; }
-  .man button.chinh { background: #1a73e8; color: #fff; border-color: #1a73e8; font-weight: 700; }
-  #mReel button.chinh { background: #8e24aa; border-color: #8e24aa; }
-  .man button.do { color: #c5221f; }
-  .the { background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+  /* ===== Màn camera ===== */
+  #cam { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #top { position: fixed; top: 0; left: 0; right: 0; z-index: 3;
+    padding: calc(var(--tren) + 8px) calc(var(--phai) + 12px) 10px calc(var(--trai) + 12px);
+    background: linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,0)); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  #thongKe { font-size: 15px; font-weight: 600; text-shadow: 0 1px 3px #000; }
+  #thongKe b { font-size: 19px; }
+  .tron { width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(60,60,67,.75);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: #fff; font-size: 20px; display: inline-flex; align-items: center; justify-content: center; }
+  .tron.bat { background: #ffd60a; color: #000; }
+
+  #khungNgam { position: fixed; left: 8%; right: 8%; top: 28%; height: 38%; border-radius: 18px; z-index: 2; pointer-events: none;
+    border: 3px solid rgba(255,255,255,.85); box-shadow: 0 0 0 100vmax rgba(0,0,0,.35); transition: border-color .15s, background .15s; }
+  #khungNgam.co { border-color: var(--luc); background: rgba(48,209,88,.35); border-width: 8px; }
+  #khungNgam.khong { border-color: var(--do); }
+  #chop { position: fixed; inset: 0; z-index: 4; pointer-events: none; background: var(--luc); opacity: 0; transition: opacity .35s; }
+  #chop.sang { opacity: .45; transition: none; }
+
+  #bang { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    padding: 12px calc(var(--phai) + 14px) calc(var(--duoi) + 12px) calc(var(--trai) + 14px);
+    background: rgba(28,28,30,.88); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-radius: 22px 22px 0 0; }
+  #ket { font-size: 22px; font-weight: 800; text-align: center; min-height: 30px; line-height: 1.25; }
+  #ket.co { color: var(--luc); font-size: 30px; }
+  #ket.khong { color: #ff9f97; font-size: 17px; }
+  #chiTiet { text-align: center; font-size: 15px; color: #d1d1d6; min-height: 20px; margin-top: 3px; word-break: break-word; }
+  #hangNut { display: flex; gap: 10px; margin-top: 12px; }
+  #hangNut button { flex: 1; height: 52px; border: 0; border-radius: 14px; font-size: 17px; font-weight: 700; color: #fff; background: #3a3a3c; }
+  #nutCheDo { background: var(--xanh) !important; }
+
+  /* ===== Màn bắt đầu ===== */
+  #batDau { position: fixed; inset: 0; z-index: 10; background: #000; overflow: auto; -webkit-overflow-scrolling: touch;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    padding: calc(var(--tren) + 20px) calc(var(--phai) + 20px) calc(var(--duoi) + 20px) calc(var(--trai) + 20px); }
+  #batDau h1 { margin: 0 0 4px; font-size: 30px; }
+  #batDau .nut { font-size: 19px; height: 58px; border: 0; border-radius: 16px; background: var(--xanh); color: #fff; font-weight: 700; margin-top: 12px; width: 100%; max-width: 380px; }
+  #batDau .nut.reel { background: var(--tim); }
+  #batDau .nut.phu { background: #2c2c2e; font-size: 17px; height: 50px; }
+  #batDau p { color: #aeaeb2; font-size: 15px; max-width: 420px; margin: 6px 0; }
+  .loi { color: #ff9f97 !important; font-weight: 600; }
+  #meoIOS { background: #1c1c1e; border-radius: 14px; padding: 12px 14px; margin-top: 18px; max-width: 380px; text-align: left; font-size: 14px; color: #c7c7cc; line-height: 1.45; }
+
+  /* ===== Màn danh sách ===== */
+  .man { position: fixed; inset: 0; z-index: 12; background: #f2f2f7; color: #000; overflow: auto; -webkit-overflow-scrolling: touch; display: none;
+    padding: 0 calc(var(--phai) + 16px) calc(var(--duoi) + 40px) calc(var(--trai) + 16px); }
+  .man h2 { position: sticky; top: 0; z-index: 1; margin: 0 -16px 12px; padding: calc(var(--tren) + 10px) 16px 10px;
+    background: rgba(242,242,247,.92); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    font-size: 22px; display: flex; justify-content: space-between; align-items: center; }
+  .man button { font-size: 17px; min-height: 44px; padding: 10px 16px; border-radius: 12px; border: 0; background: #e5e5ea; color: #000; }
+  .man button.chinh { background: var(--xanh); color: #fff; font-weight: 700; }
+  #mReel button.chinh { background: var(--tim); }
+  .man button.do { color: var(--do); }
+  .the { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 14px; }
   .hang { display: flex; gap: 8px; }
-  .hang input { flex: 1; font-size: 18px; padding: 10px; border: 1px solid #bbb; border-radius: 8px; text-transform: uppercase; font-family: ui-monospace, monospace; min-width: 0; }
-  .oGC { text-transform: none; font-family: inherit; font-size: 15px; margin-top: 8px; width: 100%; padding: 10px; border: 1px solid #bbb; border-radius: 8px; }
-  textarea { width: 100%; height: 170px; font-family: ui-monospace, monospace; font-size: 14px; padding: 8px; border: 1px solid #bbb; border-radius: 8px; }
-  .meo { font-size: 13px; color: #666; margin: 6px 0; }
-  .dong { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #eee; gap: 8px; }
+  /* iOS tự phóng to khi ô nhập < 16px -> để 16px trở lên */
+  .hang input { flex: 1; font-size: 18px; height: 48px; padding: 0 12px; border: 1px solid #c7c7cc; border-radius: 12px; text-transform: uppercase; font-family: ui-monospace, Menlo, monospace; min-width: 0; -webkit-appearance: none; }
+  .oGC { text-transform: none; font-family: inherit; font-size: 16px; margin-top: 8px; width: 100%; height: 44px; padding: 0 12px; border: 1px solid #c7c7cc; border-radius: 12px; -webkit-appearance: none; }
+  textarea { width: 100%; height: 170px; font-family: ui-monospace, Menlo, monospace; font-size: 16px; padding: 10px; border: 1px solid #c7c7cc; border-radius: 12px; -webkit-appearance: none; }
+  .meo { font-size: 13px; color: #6c6c70; margin: 6px 0; }
+  .dong { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e5e5ea; gap: 8px; }
   .dong:last-child { border-bottom: 0; }
-  .pn { font-weight: 800; font-family: ui-monospace, monospace; font-size: 17px; word-break: break-all; }
-  .gc { font-size: 13px; color: #666; }
-  .dem { font-size: 13px; background: #e6f4ea; color: #137333; padding: 3px 8px; border-radius: 10px; white-space: nowrap; }
-  .dem.chua { background: #eee; color: #777; }
-  .xoa { border: 0 !important; background: none !important; font-size: 20px !important; padding: 4px 8px !important; color: #999; }
+  .pn { font-weight: 800; font-family: ui-monospace, Menlo, monospace; font-size: 17px; word-break: break-all; }
+  .gc { font-size: 13px; color: #6c6c70; }
+  .dem { font-size: 13px; background: #e3f9e9; color: #1a7f37; padding: 4px 9px; border-radius: 10px; white-space: nowrap; font-weight: 600; }
+  .dem.chua { background: #efeff4; color: #8e8e93; }
+  .xoa { background: none !important; font-size: 20px !important; min-height: 44px; min-width: 44px; padding: 0 !important; color: #c7c7cc !important; }
 </style>
 </head>
 <body>
-<video id="cam" playsinline muted autoplay></video>
+<video id="cam" playsinline webkit-playsinline muted autoplay></video>
 <div id="khungNgam"></div>
+<div id="chop"></div>
 <div id="top">
   <div id="thongKe"></div>
-  <div style="white-space:nowrap"><button id="nutDen" hidden>🔦</button><button id="nutCheDo">PN</button><button id="nutDs">📋</button></div>
+  <div style="white-space:nowrap;display:flex;gap:8px">
+    <button id="nutDoiCam" class="tron" hidden title="Đổi camera">🔄</button>
+    <button id="nutDen" class="tron" hidden title="Đèn">🔦</button>
+  </div>
 </div>
-<div id="bang"><div id="ket">Lật tem vào khung</div><div id="chiTiet"></div></div>
+<div id="bang">
+  <div id="ket">Lật tem vào khung</div><div id="chiTiet"></div>
+  <div id="hangNut"><button id="nutCheDo">PN ⇄</button><button id="nutDs">📋 Danh sách</button></div>
+</div>
 
 <div id="batDau">
-  <h1 style="margin:0">Quét tìm liệu</h1>
-  <p>Chọn cách tìm. Lật cuộn đưa tem vào khung — tem khớp danh sách → <b style="color:#00e676">khung XANH + bíp</b>.</p>
+  <h1>Quét tìm liệu</h1>
+  <p>Lật cuộn đưa tem vào khung — tem khớp danh sách → <b style="color:#30d158">màn hình nháy XANH + bíp</b>.</p>
   <button class="nut" id="nutQuetPN">▶ TÌM THEO PN</button>
-  <p id="tomTatPN" style="margin:4px 0"></p>
+  <p id="tomTatPN"></p>
   <button class="nut reel" id="nutQuetReel">▶ TÌM THEO REEL</button>
-  <p id="tomTatReel" style="margin:4px 0"></p>
+  <p id="tomTatReel"></p>
   <button class="nut phu" id="nutMoPN">📋 Danh sách PN</button>
   <button class="nut phu" id="nutMoReel">📋 Danh sách Reel</button>
   <p id="loiCam" class="loi"></p>
+  <div id="meoIOS" hidden>
+    <b>Mẹo iPhone</b><br>
+    • Gạt nút bên hông tắt <b>chế độ Im lặng</b> để nghe tiếng bíp (iPhone không rung được từ trang web).<br>
+    • Bấm <b>Chia sẻ ⬆︎ → Thêm vào MH chính</b> để mở toàn màn hình như app.<br>
+    • Tem bị mờ khi để gần: lùi máy ra 15–20 cm hoặc bấm 🔄 đổi camera.
+  </div>
+  <p style="font-size:12px;color:#636366">Bản 28/11/2026 — tối ưu iPhone</p>
 </div>
 
 <!-- ===== Màn danh sách PN ===== -->
 <div id="mPN" class="man">
-  <h2><span>Danh sách PN cần tìm</span><button class="chinh dongMan">✓ Xong</button></h2>
+  <h2><span>Danh sách PN</span><button class="chinh dongMan">✓ Xong</button></h2>
   <div class="the">
     <b>Thêm nhanh 1 PN</b>
     <div class="hang" style="margin-top:8px">
-      <input id="oPN" placeholder="VD: EAE63801601" autocomplete="off" autocapitalize="characters">
+      <input id="oPN" placeholder="VD: EAE63801601" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
       <button id="nutThemPN" class="chinh">+ Thêm</button>
     </div>
-    <input id="oGhiChuPN" class="oGC" placeholder="Ghi chú (không bắt buộc) — VD: L2 MT-2-2-C-F, cần 2 cuộn">
+    <input id="oGhiChuPN" class="oGC" placeholder="Ghi chú (không bắt buộc) — VD: L2 MT-2-2-C-F" autocorrect="off" spellcheck="false">
   </div>
   <div class="the">
     <b>Danh sách hiện tại</b> <span class="gc" id="soPN"></span>
     <div id="dsPN"></div>
+    <button id="guiPN" class="chinh" style="margin-top:10px;width:100%">📤 Gửi / copy kết quả</button>
   </div>
   <div class="the">
     <b>Dán nhiều PN 1 lúc</b>
-    <p class="meo">Mỗi dòng 1 PN, sau PN có thể ghi chú. Dòng có Reel ID (RL…) cũng nhận, trang lấy PN trong dòng đó.</p>
-    <textarea id="nhapPN" placeholder="EAE63801601 L2 slot 2010
+    <p class="meo">Mỗi dòng 1 PN, sau PN có thể ghi chú. Dòng có Reel ID (RL…/SR…) cũng nhận, trang lấy PN trong dòng đó.</p>
+    <textarea id="nhapPN" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="EAE63801601 L2 slot 2010
 EAG66744501
 EBC64038609 cần 2 cuộn"></textarea>
     <div class="hang" style="margin-top:8px">
@@ -107,24 +167,25 @@ EBC64038609 cần 2 cuộn"></textarea>
 
 <!-- ===== Màn danh sách Reel ===== -->
 <div id="mReel" class="man">
-  <h2><span>Danh sách Reel cần tìm</span><button class="chinh dongMan">✓ Xong</button></h2>
+  <h2><span>Danh sách Reel</span><button class="chinh dongMan">✓ Xong</button></h2>
   <div class="the">
     <b>Thêm nhanh 1 Reel</b>
     <div class="hang" style="margin-top:8px">
-      <input id="oReel" placeholder="VD: RL250912345678" autocomplete="off" autocapitalize="characters">
+      <input id="oReel" placeholder="RL… hoặc SR…" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
       <button id="nutThemReel" class="chinh">+ Thêm</button>
     </div>
-    <input id="oGhiChuReel" class="oGC" placeholder="Ghi chú (không bắt buộc) — VD: PN, vị trí xe">
+    <input id="oGhiChuReel" class="oGC" placeholder="Ghi chú (không bắt buộc) — VD: PN, vị trí xe" autocorrect="off" spellcheck="false">
   </div>
   <div class="the">
     <b>Danh sách hiện tại</b> <span class="gc" id="soReel"></span>
     <div id="dsReel"></div>
+    <button id="guiReel" class="chinh" style="margin-top:10px;width:100%">📤 Gửi / copy kết quả</button>
   </div>
   <div class="the">
     <b>Dán nhiều Reel 1 lúc</b>
-    <p class="meo">Mỗi dòng 1 Reel ID (RL + 12 số). Phần còn lại của dòng (PN, SL…) thành ghi chú. Copy cột Reel từ LMS/Excel/Zalo dán vào là được.</p>
-    <textarea id="nhapReel" placeholder="RL250912345678 EAE63801601
-RL250912345679
+    <p class="meo">Mỗi dòng 1 Reel ID (RL hoặc SR + 12 số). Phần còn lại của dòng (PN, SL…) thành ghi chú. Copy cột Reel từ LMS/Excel/Zalo dán vào là được.</p>
+    <textarea id="nhapReel" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="RL250912345678 EAE63801601
+SR261031002059 EAX69047006
 RL250912345680 xe 3"></textarea>
     <div class="hang" style="margin-top:8px">
       <button id="nutThemNhieuReel" class="chinh">Thêm vào danh sách</button>
@@ -140,7 +201,7 @@ RL250912345680 xe 3"></textarea>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/zxing-wasm@2.2.4/dist/iife/reader/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/zxing-wasm@2.2.4/dist/iife/reader/index.js" onerror="window.loiTaiThuVien = true"></script>
 <script>
 // ===== Lưu trữ =====
 const K_DS = "timlieu_pn_ds", K_GAP = "timlieu_pn_gap", K_REEL = "timlieu_reel_ds", K_CHEDO = "timlieu_chedo";
@@ -158,14 +219,17 @@ const luu = () => { ghiKho(K_DS, danhSach); ghiKho(K_GAP, daGap); ghiKho(K_REEL,
 const $ = id => document.getElementById(id);
 const chuan = s => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 const thoat = s => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;");
-const MAU_REEL = /RL\d{12}/g;
+// Reel ID: RL (cuộn gốc) hoặc SR (cuộn tách) + 12 số
+const MAU_REEL = /(?:RL|SR)\d{12}/g;
+const MAU_REEL_1 = /(?:RL|SR)\d{12}/i;
+const MAU_REEL_DUNG = /^(?:RL|SR)\d{12}$/;
 const gioPhut = ms => { const d = new Date(ms); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
 
 // ----- PN -----
 function tachDongPN(d) {
   let t = String(d || "").trim();
   if (!t) return null;
-  t = t.replace(/RL\d{12}/gi, " ").trim();
+  t = t.replace(/(?:RL|SR)\d{12}/gi, " ").trim();
   const m = t.match(/[A-Za-z0-9][A-Za-z0-9\-]{5,}/);
   if (!m) return null;
   const pn = chuan(m[0]);
@@ -185,13 +249,13 @@ function themPN(pn, ghiChu) {
 function tachDongReel(d) {
   const t = String(d || "").trim();
   if (!t) return null;
-  const m = t.toUpperCase().match(/RL\d{12}/);
+  const m = t.toUpperCase().match(MAU_REEL_1);
   if (!m) return null;
   const ghiChu = t.replace(new RegExp(m[0], "i"), " ").replace(/\s+/g, " ").replace(/^[\s,;:\-\t|]+/, "").trim();
   return { reel: m[0], ghiChu };
 }
 function themReel(reel, ghiChu) {
-  reel = chuan(reel); if (!/^RL\d{12}$/.test(reel)) return false;
+  reel = chuan(reel); if (!MAU_REEL_DUNG.test(reel)) return false;
   const co = dsReel.find(x => x.reel === reel);
   if (co) { if (ghiChu) co.ghiChu = ghiChu; return true; }
   dsReel.push({ reel, ghiChu: ghiChu || "", thay: 0 });
@@ -205,8 +269,8 @@ function veThongKe() {
   $("thongKe").innerHTML = cheDo === "pn"
     ? `PN cần tìm: <b>${danhSach.length}</b> · Đã gặp: <b>${tongGap}</b> cuộn`
     : `Reel đã thấy: <b>${reelThay}</b> / <b>${dsReel.length}</b>`;
-  $("nutCheDo").textContent = cheDo === "pn" ? "PN ⇄" : "Reel ⇄";
-  $("nutCheDo").style.background = cheDo === "pn" ? "#1a73e8" : "#8e24aa";
+  $("nutCheDo").textContent = cheDo === "pn" ? "🔵 Theo PN ⇄" : "🟣 Theo Reel ⇄";
+  $("nutCheDo").style.setProperty("background", cheDo === "pn" ? "#0a84ff" : "#bf5af2", "important");
   $("tomTatPN").textContent = danhSach.length ? `Đang có ${danhSach.length} PN.` : "Chưa có PN nào.";
   $("tomTatReel").textContent = dsReel.length ? `Đang có ${dsReel.length} reel, đã thấy ${reelThay}.` : "Chưa có reel nào.";
 }
@@ -283,6 +347,39 @@ $("dsReel").addEventListener("click", e => {
 });
 $("boDemReel").onclick = () => { dsReel.forEach(x => x.thay = 0); luu(); veHet(); };
 
+// ===== Gửi / copy kết quả (Zalo, Excel) =====
+function ngayGio() {
+  const d = new Date(), h = n => String(n).padStart(2, "0");
+  return `${h(d.getDate())}/${h(d.getMonth() + 1)} ${h(d.getHours())}:${h(d.getMinutes())}`;
+}
+function vanBanPN() {
+  const sx = [...danhSach].sort((a, b) => a.pn.localeCompare(b.pn));
+  const da = sx.filter(x => (daGap[x.pn] || []).length), chua = sx.filter(x => !(daGap[x.pn] || []).length);
+  const dong = x => x.pn + (x.ghiChu ? " — " + x.ghiChu : "");
+  return [`KẾT QUẢ TÌM THEO PN (${ngayGio()})`,
+    `ĐÃ GẶP (${da.length}):`, ...da.map(x => dong(x) + " — " + daGap[x.pn].length + " cuộn: " + daGap[x.pn].filter(k => MAU_REEL_DUNG.test(k)).join(", ")),
+    `CHƯA GẶP (${chua.length}):`, ...chua.map(dong)].join("\n");
+}
+function vanBanReel() {
+  const sx = [...dsReel].sort((a, b) => a.reel.localeCompare(b.reel));
+  const da = sx.filter(x => x.thay), chua = sx.filter(x => !x.thay);
+  const dong = x => x.reel + (x.ghiChu ? " — " + x.ghiChu : "");
+  return [`KẾT QUẢ TÌM THEO REEL (${ngayGio()})`,
+    `ĐÃ THẤY (${da.length}):`, ...da.map(x => dong(x) + " — lúc " + gioPhut(x.thay)),
+    `CHƯA THẤY (${chua.length}):`, ...chua.map(dong)].join("\n");
+}
+async function guiVanBan(vb, nut) {
+  const cu = nut.textContent;
+  try {
+    if (navigator.share) { await navigator.share({ text: vb }); return; }
+  } catch(e) { if (e.name === "AbortError") return; }
+  try { await navigator.clipboard.writeText(vb); nut.textContent = "✓ Đã copy, dán vào Zalo/Excel"; }
+  catch(e) { window.prompt("Copy đoạn này:", vb); }
+  setTimeout(() => nut.textContent = cu, 2500);
+}
+$("guiPN").onclick = () => guiVanBan(vanBanPN(), $("guiPN"));
+$("guiReel").onclick = () => guiVanBan(vanBanReel(), $("guiReel"));
+
 // Nút xóa hết: bấm 2 lần mới xóa
 function nutXoa2Lan(id, nhan, lam) {
   let chac = false;
@@ -318,43 +415,135 @@ async function batDau(cd) {
   if (dangQuet) { $("batDau").style.display = "none"; return; }
   try { ac = new (window.AudioContext || window.webkitAudioContext)(); await ac.resume(); } catch(e) {}
   try {
-    const st = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } }
-    });
-    video.srcObject = st; await video.play();
-    track = st.getVideoTracks()[0];
-    try {
-      const cap = track.getCapabilities ? track.getCapabilities() : {};
-      if (cap.focusMode && cap.focusMode.includes("continuous")) await track.applyConstraints({ advanced: [{ focusMode: "continuous" }] });
-      if (cap.torch) $("nutDen").hidden = false;
-    } catch(e) {}
+    await moCamera();
   } catch(e) {
-    $("loiCam").textContent = "Không mở được camera: " + e.message + ". Cho phép quyền Camera cho trang này rồi thử lại.";
+    $("loiCam").textContent = "Không mở được camera: " + e.message +
+      (laIOS ? ". Vào Cài đặt → Safari → Camera → chọn Cho phép, rồi tải lại trang." : ". Cho phép quyền Camera cho trang này rồi thử lại.");
     return;
   }
+  // Danh sách camera sau (iPhone Pro có nhiều ống kính) -> hiện nút đổi camera
+  try {
+    const tb = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === "videoinput");
+    camSau = tb.filter(d => /back|sau|rear|environment/i.test(d.label));
+    if (!camSau.length) camSau = tb;
+    $("nutDoiCam").hidden = camSau.length < 2;
+  } catch(e) {}
+  giuManHinhSang();
   try {
     if ("BarcodeDetector" in window) {
       const f = await BarcodeDetector.getSupportedFormats();
       if (f.length) detector = new BarcodeDetector({ formats: f });
     }
   } catch(e) { detector = null; }
-  if (!detector) { try { ZXingWASM.prepareZXingModule({ fireImmediately: true }); } catch(e) {} }
+  if (!detector) {
+    // Máy không có bộ đọc mã sẵn (VD iPhone) -> phải dùng thư viện ZXing tải từ mạng
+    const loi = await chuanBiZXing();
+    if (loi) {
+      $("loiCam").innerHTML = "⚠ KHÔNG QUÉT ĐƯỢC: " + loi +
+        "<br>Kiểm tra WiFi/4G rồi tải lại trang. Trên Android nên mở bằng <b>Chrome</b> (có bộ đọc sẵn, không cần mạng).";
+      try { video.srcObject.getTracks().forEach(t => t.stop()); } catch(e) {}
+      return;
+    }
+  }
   $("batDau").style.display = "none";
   dangQuet = true; vongQuet();
+}
+
+// Tải và khởi động thư viện ZXing, trả về chuỗi lỗi hoặc "" nếu ổn
+async function chuanBiZXing() {
+  if (window.loiTaiThuVien || typeof ZXingWASM === "undefined") return "không tải được bộ đọc mã (mất mạng hoặc mạng công ty chặn jsdelivr.net).";
+  try {
+    await Promise.race([
+      ZXingWASM.prepareZXingModule({ fireImmediately: true }),
+      new Promise((_, tuChoi) => setTimeout(() => tuChoi(new Error("quá 20 giây")), 20000))
+    ]);
+    return "";
+  } catch(e) {
+    return "bộ đọc mã khởi động lỗi (" + e.message + ").";
+  }
 }
 $("nutQuetPN").onclick = () => batDau("pn");
 $("nutQuetReel").onclick = () => batDau("reel");
 
-let denBat = false;
-$("nutDen").onclick = async () => { denBat = !denBat; try { await track.applyConstraints({ advanced: [{ torch: denBat }] }); } catch(e) {} };
+const laIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+if (laIOS) $("meoIOS").hidden = false;
+let camSau = [], viTriCam = -1;
 
+// Mở camera; maThietBi rỗng = camera sau mặc định
+async function moCamera(maThietBi) {
+  if (video.srcObject) { try { video.srcObject.getTracks().forEach(t => t.stop()); } catch(e) {} }
+  const rang = maThietBi
+    ? { deviceId: { exact: maThietBi }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+    : { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } };
+  const st = await navigator.mediaDevices.getUserMedia({ audio: false, video: rang });
+  video.srcObject = st; await video.play();
+  track = st.getVideoTracks()[0];
+  denBat = false; $("nutDen").classList.remove("bat");
+  try {
+    const cap = track.getCapabilities ? track.getCapabilities() : {};
+    if (cap.focusMode && cap.focusMode.includes("continuous")) await track.applyConstraints({ advanced: [{ focusMode: "continuous" }] });
+    $("nutDen").hidden = !cap.torch;
+  } catch(e) {}
+}
+
+$("nutDoiCam").onclick = async () => {
+  if (!camSau.length) return;
+  viTriCam = (viTriCam + 1) % camSau.length;
+  try {
+    await moCamera(camSau[viTriCam].deviceId);
+    bao("", "📷 " + (camSau[viTriCam].label || "Camera " + (viTriCam + 1)), "");
+  } catch(e) { bao("khong", "Không đổi được camera", e.message); }
+};
+
+let denBat = false;
+$("nutDen").onclick = async () => {
+  denBat = !denBat;
+  try { await track.applyConstraints({ advanced: [{ torch: denBat }] }); $("nutDen").classList.toggle("bat", denBat); } catch(e) {}
+};
+
+// Giữ màn hình không tự tắt khi đang dò (iOS 16.4+)
+let khoaManHinh = null;
+async function giuManHinhSang() {
+  try { if ("wakeLock" in navigator && !khoaManHinh) { khoaManHinh = await navigator.wakeLock.request("screen"); khoaManHinh.onrelease = () => khoaManHinh = null; } } catch(e) {}
+}
+// iPhone dừng camera khi khoá máy / chuyển app -> quay lại thì mở lại
+document.addEventListener("visibilitychange", async () => {
+  if (document.hidden || !dangQuet) return;
+  giuManHinhSang();
+  try { if (ac && ac.state !== "running") await ac.resume(); } catch(e) {}
+  const conSong = track && track.readyState === "live";
+  try {
+    if (!conSong) await moCamera(viTriCam >= 0 ? camSau[viTriCam].deviceId : "");
+    else if (video.paused) await video.play();
+  } catch(e) { bao("khong", "Camera bị tắt", "chạm vào màn hình hoặc tải lại trang"); }
+});
+// Chạm màn hình camera: bật lại video/âm thanh nếu iPhone đã tạm dừng
+video.addEventListener("click", () => { try { video.play(); ac && ac.resume(); } catch(e) {} });
+
+// Đổi vị trí khung ngắm trên màn hình sang toạ độ ảnh camera (video hiển thị kiểu object-fit: cover)
+function vungKhungTrenAnh(vw, vh) {
+  const r = khung.getBoundingClientRect();
+  const W = window.innerWidth, H = window.innerHeight;
+  const tiLe = Math.max(W / vw, H / vh);
+  const lechX = (W - vw * tiLe) / 2, lechY = (H - vh * tiLe) / 2;
+  const le = 0.04 * Math.min(r.width, r.height); // nới khung một chút cho dễ đọc
+  let x = (r.left - le - lechX) / tiLe, y = (r.top - le - lechY) / tiLe;
+  let w = (r.width + 2 * le) / tiLe, h = (r.height + 2 * le) / tiLe;
+  x = Math.max(0, x); y = Math.max(0, y);
+  w = Math.min(vw - x, w); h = Math.min(vh - y, h);
+  return { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) };
+}
+
+const RONG_TOI_DA = 1280; // thu nhỏ ảnh trước khi đọc cho đỡ nóng máy
 async function docKhung() {
   const vw = video.videoWidth, vh = video.videoHeight;
   if (!vw) return [];
-  const sx = Math.round(vw * 0.05), sy = Math.round(vh * 0.2), sw = vw - 2 * sx, sh = Math.round(vh * 0.6);
+  const v = vungKhungTrenAnh(vw, vh);
+  if (v.w < 20 || v.h < 20) return [];
+  const thuNho = Math.min(1, RONG_TOI_DA / v.w);
+  const sw = Math.round(v.w * thuNho), sh = Math.round(v.h * thuNho);
   canvas.width = sw; canvas.height = sh;
-  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
+  ctx.drawImage(video, v.x, v.y, v.w, v.h, 0, 0, sw, sh);
   if (detector) return (await detector.detect(canvas)).map(b => b.rawValue);
   const img = ctx.getImageData(0, 0, sw, sh);
   const r = await ZXingWASM.readBarcodes(img, { tryHarder: true, maxNumberOfSymbols: 8, formats: [] });
@@ -368,14 +557,18 @@ function bao(loai, chinh, phu) {
   clearTimeout(tatBao);
   tatBao = setTimeout(() => { khung.className = ""; if (loai !== "co") { $("ket").className = ""; $("ket").textContent = "Lật tem vào khung"; $("chiTiet").textContent = ""; } }, loai === "co" ? 2500 : 900);
 }
-function baoTrung() { bip(1300, .18); setTimeout(() => bip(1700, .18), 200); rung([120, 60, 120]); }
+// iPhone không rung được từ web -> nháy cả màn hình xanh để dễ thấy
+function nhayManHinh() { const c = $("chop"); c.classList.add("sang"); setTimeout(() => c.classList.remove("sang"), 60); }
+function baoTrung() { bip(1300, .18); setTimeout(() => bip(1700, .18), 200); rung([120, 60, 120]); nhayManHinh(); }
 
 // ----- Xử lý theo PN -----
 function xuLyPN(cacMa, gop, reel) {
   const sx = [...danhSach].sort((a, b) => b.pn.length - a.pn.length); // PN dài khớp trước
   const trung = sx.find(x => gop.includes(x.pn));
   if (trung) {
-    const khoaCuon = reel || gop.slice(0, 60);
+    // Khoá nhận diện cuộn: Reel ID nếu có; không có thì lấy mã chứa PN (ổn định hơn ghép cả tem)
+    const maCoPN = cacMa.map(chuan).filter(m => m.includes(trung.pn)).sort((a, b) => b.length - a.length)[0];
+    const khoaCuon = reel || (maCoPN || gop).slice(0, 60);
     const ds = daGap[trung.pn] || (daGap[trung.pn] = []);
     const moi = !ds.includes(khoaCuon);
     if (moi) { ds.push(khoaCuon); luu(); veThongKe(); }
@@ -414,13 +607,20 @@ function xuLy(cacMa) {
   const khoa = cheDo + ":" + gop;
   if (vuaThay.has(khoa) && now - vuaThay.get(khoa) < 2500) return;
   vuaThay.set(khoa, now);
+  if (vuaThay.size > 300) for (const [k, t] of vuaThay) if (now - t > 5000) vuaThay.delete(k);
   if (cheDo === "reel") xuLyReel(cacMa, gop);
   else xuLyPN(cacMa, gop, (gop.match(MAU_REEL) || [])[0] || "");
 }
 
+let soLanLoi = 0;
 async function vongQuet() {
   if (!dangQuet) return;
-  try { if (!document.hidden) xuLy(await docKhung()); } catch(e) {}
+  try {
+    if (!document.hidden) { xuLy(await docKhung()); soLanLoi = 0; }
+  } catch(e) {
+    // Lỗi đọc liên tục -> báo lên màn hình thay vì im lặng
+    if (++soLanLoi >= 10) { bao("khong", "⚠ Bộ đọc mã đang lỗi", e.message + " — tải lại trang"); soLanLoi = 0; }
+  }
   setTimeout(vongQuet, detector ? 60 : 120);
 }
 </script>
